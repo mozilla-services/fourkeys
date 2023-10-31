@@ -15,7 +15,7 @@
 steps:
 - # Build new-source worker image
   name: gcr.io/cloud-builders/docker:latest
-  args: ['build', 
+  args: ['build',
          '--tag=gcr.io/$PROJECT_ID/${_SOURCE}-parser', '.']
   id: build
 

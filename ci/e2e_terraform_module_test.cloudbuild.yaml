@@ -1,4 +1,4 @@
-### Work in progress! 
+### Work in progress!
 # This Cloud Build config will provision 4Keys infra using the modules in /terraform
 # and then confirm that the dashboard is working correctly
 
@@ -151,8 +151,8 @@ steps:
 
       echo "Dashboard URL: $${DASHBOARD_URL}"
       DASHBOARD_HTTP_RESPONSE_CODE=$(curl -LI $${DASHBOARD_URL} -o /dev/null -w '%{http_code}\n' -s)
-      if [ $${DASHBOARD_HTTP_RESPONSE_CODE} == "200" ]; then 
-          echo "success" 
+      if [ $${DASHBOARD_HTTP_RESPONSE_CODE} == "200" ]; then
+          echo "success"
       else
           echo "Error validating dashboard URL; received $${DASHBOARD_HTTP_RESPONSE_CODE} from $${DASHBOARD_URL}"
           exit 1

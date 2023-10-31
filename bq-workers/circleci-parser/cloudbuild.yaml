@@ -15,7 +15,7 @@
 steps:
 - # Build circleci worker image
   name: gcr.io/cloud-builders/docker:latest
-  args: ['build', 
+  args: ['build',
          '--tag=gcr.io/$PROJECT_ID/circleci-parser', '.']
   id: build
 

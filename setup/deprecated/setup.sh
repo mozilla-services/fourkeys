@@ -56,13 +56,13 @@ fourkeys_project_setup () {
   export BILLING_ACCOUNT=$(gcloud beta billing projects describe ${FOURKEYS_PROJECT} --format="value(billingAccountName)")
 
   if [[ ! ${BILLING_ACCOUNT} ]]
-  then echo "Please enable billing account on ${FOURKEYS_PROJECT}" 
+  then echo "Please enable billing account on ${FOURKEYS_PROJECT}"
   exit
   fi
 
   export FOURKEYS_REGION=us-central1
 
-  echo "Setting up project for Four Keys Dashboard..." 
+  echo "Setting up project for Four Keys Dashboard..."
   get_project_number
   gcloud config set project ${FOURKEYS_PROJECT}; set -x
   set +x; echo
@@ -123,7 +123,7 @@ fourkeys_project_setup () {
   then tekton_pipeline
   fi
   # Only set up GitLab pipeline if it wasn't selected as the version control system
-  if [[ ${cicd_system} == "3" &&  ${git_system} != "1" ]] 
+  if [[ ${cicd_system} == "3" &&  ${git_system} != "1" ]]
   then gitlab_pipeline
   else echo "Please see the documentation to learn how to extend to sources other than Cloud Build, Tekton, GitLab, or GitHub."
   fi
@@ -143,7 +143,7 @@ fourkeys_project_setup () {
     --table -f\
     ${FOURKEYS_PROJECT}:four_keys.deployments \
     $DIR/deployments_schema.json
-  
+
   bq mk \
     --table -f\
     ${FOURKEYS_PROJECT}:four_keys.events_raw \
@@ -173,7 +173,7 @@ fourkeys_project_setup () {
   else
 
   # If not, create and save secret
-  SECRET="$(python3 -c 'import secrets 
+  SECRET="$(python3 -c 'import secrets
 print(secrets.token_hex(20))' | tr -d '\n')"
   echo $SECRET | tr -d '\n' | gcloud beta secrets create event-handler \
     --replication-policy=automatic \
@@ -273,7 +273,7 @@ cloud_build_pipeline(){
 
   echo "Deploying BQ cloud build worker..."; set -x
   cd $DIR/../../bq-workers/cloud-build-parser
-  gcloud builds submit --substitutions _TAG=latest,_REGION=${FOURKEYS_REGION} . 
+  gcloud builds submit --substitutions _TAG=latest,_REGION=${FOURKEYS_REGION} .
   set +x; echo
 
   echo "Creating cloud-builds topic..."; set -x
@@ -325,7 +325,7 @@ tekton_pipeline(){
 
 generate_data(){
   gcloud config set project ${FOURKEYS_PROJECT}
-  echo "Creating mock data..."; 
+  echo "Creating mock data...";
   export WEBHOOK=$(gcloud run services describe event-handler --format="value(status.url)")
   export SECRET=$SECRET
 
@@ -344,14 +344,14 @@ generate_data(){
     set +x
   fi
     if [[ ${git_system} == "2" ]]
-    then set -x; python3 ${DIR}/../../data-generator/generate_data.py --vc_system=github 
+    then set -x; python3 ${DIR}/../../data-generator/generate_data.py --vc_system=github
     set +x
   fi
-  
+
 }
 
 schedule_bq_queries(){
-  echo "Check BigQueryDataTransfer is enabled" 
+  echo "Check BigQueryDataTransfer is enabled"
   enabled=$(gcloud services list --enabled --filter name:bigquerydatatransfer.googleapis.com)
 
   while [[ "${enabled}" != *"bigquerydatatransfer.googleapis.com"* ]]
@@ -366,7 +366,7 @@ schedule_bq_queries(){
   ./schedule.sh --query_file=changes.sql --table=changes --project_id=$FOURKEYS_PROJECT
   ./schedule.sh --query_file=deployments.sql --table=deployments --project_id=$FOURKEYS_PROJECT
   ./schedule.sh --query_file=incidents.sql --table=incidents --project_id=$FOURKEYS_PROJECT
-  
+
   set +x; echo
   cd ${DIR}
 }
@@ -380,7 +380,7 @@ project_prompt(){
   # Prompt until project-id is correct
   if [[ ${FOURKEYS_PROJECT} ]]
   then read -p "Would you like to use ${FOURKEYS_PROJECT} to deploy a new Cloud Run worker? (y/n) :" yesno
-  fi 
+  fi
 
   if [[ ${yesno} == "y" ]]
   then continue=0
@@ -407,7 +407,7 @@ get_project_number(){
 }
 
 check_bq_status(){
-  echo "Waiting for BigQuery jobs to complete..." 
+  echo "Waiting for BigQuery jobs to complete..."
   continue=1
   while [[ ${continue} -gt 0 ]]
   do
@@ -432,7 +432,7 @@ else project_prompt
 fi
 
 # Create workers for the correct sources
-read -p "Which version control system are you using? 
+read -p "Which version control system are you using?
 (1) GitLab
 (2) GitHub
 (3) Other
@@ -440,7 +440,7 @@ read -p "Which version control system are you using?
 Enter a selection (1 - 3):" git_system
 
 
-read -p "Which CI/CD system are you using? 
+read -p "Which CI/CD system are you using?
 (1) Cloud Build
 (2) Tekton
 (3) GitLab

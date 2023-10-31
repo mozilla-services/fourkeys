@@ -26,7 +26,7 @@ are set: WEBHOOK, SECRET"
 exit 1
 fi
 
-read -p "Which version control system are you using? 
+read -p "Which version control system are you using?
 (1) GitLab
 (2) GitHub
 

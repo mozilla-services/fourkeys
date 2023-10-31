@@ -69,7 +69,7 @@ dispute. If you are unable to resolve the matter for any reason, or if the
 behavior is threatening or harassing, report it. We are dedicated to providing
 an environment where participants feel welcome and safe.
 
-Reports should be directed to Dina Graves Portman dinagraves@google.com and 
+Reports should be directed to Dina Graves Portman dinagraves@google.com and
 Don McCasland donmccasland@google.com, the
 Project Steward(s) for Four Keys. It is the Project Steward’s duty to
 receive and address reported violations of the code of conduct. They will then

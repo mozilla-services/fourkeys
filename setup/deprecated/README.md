@@ -158,7 +158,7 @@ And now, whenever a pull request is merged into master of your fork, Cloud Build
 1.  In your GitLab repo, navigate to `Settings` on the left-hand menu and then select `CI/CD`.
 1.  Save your account key under variables.
     1.  In the **key** field, input `SERVICE_ACCOUNT`.
-    1.  In the **Value** field, input the JSON . 
+    1.  In the **Value** field, input the JSON .
     1.  Select **Protect variable**.
 1.  Save your Google Cloud project-id under variables.
     1.  In the **key** field, input `PROJECT_ID`.
@@ -184,7 +184,7 @@ This setup will trigger a deployment on any `push` to the `master` branch.
 
 ### Collecting incident data
 
-Four Keys uses GitLab and/or GitHub issues to track incidents.  
+Four Keys uses GitLab and/or GitHub issues to track incidents.
 
 #### Creating an incident
 

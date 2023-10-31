@@ -22,7 +22,7 @@ environment(){
 
 	if [[ ! ${FOURKEYS_PROJECT} ]]
 	# If env.sh does not exist, use current active project
-	then FOURKEYS_PROJECT=$(gcloud config get-value project) 
+	then FOURKEYS_PROJECT=$(gcloud config get-value project)
 	fi
 }
 
@@ -55,7 +55,7 @@ build_deploy_cloud_run(){
 	cp -R $DIR/../../bq-workers/new-source-template $DIR/../../bq-workers/${nickname}-parser
 	cd $DIR/../../bq-workers/${nickname}-parser
   gcloud builds submit --substitutions _SOURCE=${nickname},_REGION=us-central1 \
-						 --project ${FOURKEYS_PROJECT} . 
+						 --project ${FOURKEYS_PROJECT} .
 }
 
 set_permissions(){
@@ -70,7 +70,7 @@ setup_pubsub_topic_subscription(){
 	# Get push endpoint for new service
 	export PUSH_ENDPOINT_URL=$(gcloud run services describe ${nickname}-worker \
 	--format="value(status.url)" --project ${FOURKEYS_PROJECT} \
-	--platform managed --region us-central1) 
+	--platform managed --region us-central1)
 
 	# Create topic
 	echo "Creating event handler Pub/Sub topic..."; set -x

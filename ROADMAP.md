@@ -4,7 +4,7 @@
 
 Four Keys mission:
 
-  Be the industry-standard reference implementation for the automated calculation of the [DORA](https://cloud.google.com/blog/products/devops-sre/the-2019-accelerate-state-of-devops-elite-performance-productivity-and-scaling) Four Key metrics.  
+  Be the industry-standard reference implementation for the automated calculation of the [DORA](https://cloud.google.com/blog/products/devops-sre/the-2019-accelerate-state-of-devops-elite-performance-productivity-and-scaling) Four Key metrics.
 
 The vision for this is:
 
@@ -16,7 +16,7 @@ The vision for this is:
 Non-goals:
 
 * The DORA research includes predictive analytics, recommendations, and improvement strategies. The Four Keys dashboard will not provide these resources. It will simply be a reflection of an organization’s software delivery performance.
-*  Four Keys does not intend to be a one-stop shop for all operational performance metrics. The focus of this project should always be on the predictive metrics identified by the DORA research. 
+*  Four Keys does not intend to be a one-stop shop for all operational performance metrics. The focus of this project should always be on the predictive metrics identified by the DORA research.
 
 ## Roadmap
 
@@ -24,10 +24,10 @@ Non-goals:
   * Enriching the dashboard
     * [More data points](https://github.com/dora-team/fourkeys/issues/77)
     * New data views for drilling down into the metrics
-  * More native Terraform installation 
+  * More native Terraform installation
     * Currently, the setup is a mix of `gcloud` commands and Terraform configuration.  We will move away from `gcloud` commands and rely more on the declarative Terraform setup.
 * Long Term
-  * CloudEvents migration 
+  * CloudEvents migration
     * Migrate the `four_keys.events_raw` schema to [CloudEvents](https://github.com/cloudevents/spec) schema
     * Use the CloudEvents adapters to do the ETL rather than the current [workers](bq-workers/)
   * New Integrations

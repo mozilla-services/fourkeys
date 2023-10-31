@@ -1,6 +1,6 @@
 # Four Keys Terraform
 
-This directory contains modules and examples for deploying Four Keys with Terraform. The primary module `modules/fourkeys` uses the other sub-modules to deploy resources to a provided Google Cloud Project.  
+This directory contains modules and examples for deploying Four Keys with Terraform. The primary module `modules/fourkeys` uses the other sub-modules to deploy resources to a provided Google Cloud Project.
 
 ## Usage
 
@@ -74,7 +74,7 @@ To deploy Four Keys with Terraform, you will first need:
 
 ## Generating mock data
 
-To test your Four Keys deployment, you can generate mock data that simulates events from a GitHub repository.  
+To test your Four Keys deployment, you can generate mock data that simulates events from a GitHub repository.
 
 1. Export your event handler URL an environment variable. This is the webhook URL that will receive events:
 
