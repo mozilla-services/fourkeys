@@ -19,5 +19,7 @@ output "fourkeys_service_account_email" {
   value = google_service_account.fourkeys.email
 }
 
-
+output "dataset_id" {
+  value = google_bigquery_dataset.fourkeys.id
+}
 
