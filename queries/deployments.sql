@@ -80,6 +80,10 @@ SELECT
   source,
   deploy_id,
   time_created,
+  CASE
+    WHEN source LIKE "github%" THEN JSON_EXTRACT_SCALAR(change_metadata, '$.repository.full_name')
+  END
+    AS service,
   main_commit,
   ARRAY_AGG(DISTINCT JSON_EXTRACT_SCALAR(array_commits, '$.id')) AS changes,
 FROM
@@ -90,4 +94,5 @@ GROUP BY
   1,
   2,
   3,
-  4;
+  4,
+  5;
