@@ -3,6 +3,10 @@ WITH
   deploys AS (  -- Cloud Build, GitHub, ArgoCD
     SELECT
       source,
+      CASE
+        WHEN source LIKE "github%" THEN JSON_EXTRACT_SCALAR(metadata, '$.repository.full_name')
+      END
+        AS service,
       id AS deploy_id,
       time_created,
       CASE
@@ -32,13 +36,18 @@ WITH
   changes_raw AS (
     SELECT
       id,
-      metadata AS change_metadata
+      metadata AS change_metadata,
+      CASE
+        WHEN source LIKE "github%" THEN JSON_EXTRACT_SCALAR(metadata, '$.repository.full_name')
+      END
+        AS service
     FROM
       four_keys.events_raw
   ),
   deployment_changes AS (
     SELECT
       source,
+      deploys.service,
       deploy_id,
       deploys.time_created time_created,
       change_metadata,
@@ -49,16 +58,13 @@ WITH
     JOIN
       changes_raw
     ON
-      ( changes_raw.id = deploys.main_commit OR changes_raw.id IN UNNEST(deploys.additional_commits) )
+      ( changes_raw.service = deploys.service ) AND ( changes_raw.id = deploys.main_commit OR changes_raw.id IN UNNEST(deploys.additional_commits) )
   )
 SELECT
   source,
+  service,
   deploy_id,
   time_created,
-  CASE
-    WHEN source LIKE "github%" THEN JSON_EXTRACT_SCALAR(change_metadata, '$.repository.full_name')
-  END
-    AS service,
   main_commit,
   ARRAY_AGG(DISTINCT JSON_EXTRACT_SCALAR(array_commits, '$.id')) AS changes,
 FROM
