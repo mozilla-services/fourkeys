@@ -1,6 +1,7 @@
 -- Incidents View
 SELECT
   source,
+  service,
   incident_id,
   MIN(IF(root.time_created < issue.time_created, root.time_created, issue.time_created)) AS time_created,
   MAX(time_resolved) AS time_resolved,
@@ -8,6 +9,11 @@ SELECT
 FROM (
   SELECT
     source,
+    CASE
+      WHEN source LIKE "github%" THEN JSON_EXTRACT_SCALAR(metadata, '$.repository.full_name')
+      WHEN source LIKE "pagerduty%" THEN JSON_EXTRACT_SCALAR(metadata, '$.event.data.service.summary')
+    END
+      AS service,
     CASE
       WHEN source LIKE "github%" THEN JSON_EXTRACT_SCALAR(metadata, '$.issue.number')
       WHEN source LIKE "pagerduty%" THEN JSON_EXTRACT_SCALAR(metadata, '$.event.data.id')
@@ -48,6 +54,7 @@ ON
   root.changes = root_cause
 GROUP BY
   1,
-  2
+  2,
+  3
 HAVING
   MAX(bug) IS TRUE ;
