@@ -22,23 +22,6 @@ WITH deploys_cloudbuild_github AS (# Cloud Build, Github
       OR (source = "argocd" AND JSON_EXTRACT_SCALAR(metadata, '$.status') = "SUCCESS")
       )
     ),
-    deploys_tekton AS (# Tekton Pipelines
-      SELECT
-      source,
-      id as deploy_id,
-      time_created,
-      IF(JSON_EXTRACT_SCALAR(param, '$.name') = "gitrevision", JSON_EXTRACT_SCALAR(param, '$.value'), Null) as main_commit,
-      ARRAY<string>[] AS additional_commits
-      FROM (
-      SELECT 
-      id,
-      TIMESTAMP_TRUNC(time_created, second) as time_created,
-      source,
-      four_keys.json2array(JSON_EXTRACT(metadata, '$.data.pipelineRun.spec.params')) params
-      FROM four_keys.events_raw
-      WHERE event_type = "dev.tekton.event.pipelinerun.successful.v1" 
-      AND metadata like "%gitrevision%") e, e.params as param
-    ),
     deploys_circleci AS (# CircleCI pipelines
       SELECT
       source,
@@ -52,8 +35,6 @@ WITH deploys_cloudbuild_github AS (# Cloud Build, Github
     deploys AS (
       SELECT * FROM
       deploys_cloudbuild_github
-      UNION ALL
-      SELECT * FROM deploys_tekton
       UNION ALL
       SELECT * FROM deploys_circleci
     ),
