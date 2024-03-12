@@ -1,6 +1,6 @@
 -- Deployments View: For GitHub `deploy_id` is the ID of the Deployment Status.
 WITH
-  deploys_cloudbuild_github AS (  -- Cloud Build, GitHub, ArgoCD
+  deploys AS (  -- Cloud Build, GitHub, ArgoCD
     SELECT
       source,
       id AS deploy_id,
@@ -26,33 +26,8 @@ WITH
         -- GitHub Deployments
         OR (source LIKE "github%" AND event_type = "deployment_status" AND JSON_EXTRACT_SCALAR(metadata, '$.deployment_status.state') = "success")
         -- ArgoCD Deployments
-        OR (source = "argocd" AND JSON_EXTRACT_SCALAR(metadata, '$.status') = "SUCCESS") )
-  ),
-  deploys_circleci AS (  -- CircleCI pipelines
-    SELECT
-      source,
-      id AS deploy_id,
-      time_created,
-      JSON_EXTRACT_SCALAR(metadata, '$.pipeline.vcs.revision') AS main_commit,
-      ARRAY<string>[] AS additional_commits
-    FROM
-      four_keys.events_raw
-    WHERE
-      (source = "circleci"
-        AND event_type = "workflow-completed"
-        AND JSON_EXTRACT_SCALAR(metadata, '$.workflow.name') LIKE "%deploy%"
-        AND JSON_EXTRACT_SCALAR(metadata, '$.workflow.status') = "success")
-  ),
-  deploys AS (
-    SELECT
-      *
-    FROM
-      deploys_cloudbuild_github
-    UNION ALL
-    SELECT
-      *
-    FROM
-      deploys_circleci
+        OR (source = "argocd" AND JSON_EXTRACT_SCALAR(metadata, '$.status') = "SUCCESS")
+      )
   ),
   changes_raw AS (
     SELECT
