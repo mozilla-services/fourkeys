@@ -1,20 +1,12 @@
 # Deployments Table
 
-WITH deploys_cloudbuild_github_gitlab AS (# Cloud Build, Github, Gitlab pipelines
+WITH deploys_cloudbuild_github AS (# Cloud Build, Github
       SELECT 
       source,
       id as deploy_id,
       time_created,
       CASE WHEN source = "cloud_build" then JSON_EXTRACT_SCALAR(metadata, '$.substitutions.COMMIT_SHA')
            WHEN source like "github%" then JSON_EXTRACT_SCALAR(metadata, '$.deployment.sha')
-           WHEN source like "gitlab%" then COALESCE(
-                                    # Data structure from GitLab Pipelines
-                                    JSON_EXTRACT_SCALAR(metadata, '$.commit.id'),
-                                    # Data structure from GitLab Deployments
-                                    # REGEX to get the commit sha from the URL
-                                    REGEXP_EXTRACT(
-                                      JSON_EXTRACT_SCALAR(metadata, '$.commit_url'), r".*commit\/(.*)")
-                                      )
            WHEN source = "argocd" then JSON_EXTRACT_SCALAR(metadata, '$.commit_sha') end as main_commit,
       CASE WHEN source LIKE "github%" THEN ARRAY(
                 SELECT JSON_EXTRACT_SCALAR(string_element, '$')
@@ -26,10 +18,6 @@ WITH deploys_cloudbuild_github_gitlab AS (# Cloud Build, Github, Gitlab pipeline
          (source = "cloud_build" AND JSON_EXTRACT_SCALAR(metadata, '$.status') = "SUCCESS")
       # GitHub Deployments
       OR (source LIKE "github%" and event_type = "deployment_status" and JSON_EXTRACT_SCALAR(metadata, '$.deployment_status.state') = "success")
-      # GitLab Pipelines 
-      OR (source LIKE "gitlab%" AND event_type = "pipeline" AND JSON_EXTRACT_SCALAR(metadata, '$.object_attributes.status') = "success")
-      # GitLab Deployments 
-      OR (source LIKE "gitlab%" AND event_type = "deployment" AND JSON_EXTRACT_SCALAR(metadata, '$.status') = "success")
       # ArgoCD Deployments
       OR (source = "argocd" AND JSON_EXTRACT_SCALAR(metadata, '$.status') = "SUCCESS")
       )
@@ -63,7 +51,7 @@ WITH deploys_cloudbuild_github_gitlab AS (# Cloud Build, Github, Gitlab pipeline
     ),
     deploys AS (
       SELECT * FROM
-      deploys_cloudbuild_github_gitlab
+      deploys_cloudbuild_github
       UNION ALL
       SELECT * FROM deploys_tekton
       UNION ALL
