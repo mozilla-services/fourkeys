@@ -11,7 +11,7 @@ SELECT
 FROM
   four_keys.events_raw e,
   -- Create a row for each element in the array of `commits` from the `metadata` field.
-  -- The other fields in the fields in the row are repeated for each element.
+  -- The other fields in the row are repeated for each `commit`.
   UNNEST(JSON_EXTRACT_ARRAY(e.metadata, '$.commits')) AS commit
 WHERE
   event_type = "push"
