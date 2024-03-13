@@ -1,5 +1,5 @@
 # Changes Table
-SELECT 
+SELECT
 source,
 event_type,
 JSON_EXTRACT_SCALAR(commit, '$.id') change_id,

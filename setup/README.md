@@ -58,7 +58,7 @@ To deploy Four Keys with Terraform, you will first need:
 
 ## Generating mock data
 
-To test your Four Keys deployment, you can generate mock data that simulates events from a GitHub repository.  
+To test your Four Keys deployment, you can generate mock data that simulates events from a GitHub repository.
 
 1. Export your event handler URL an environment variable. This is the webhook URL that will receive events:
 

@@ -30,17 +30,17 @@ This project follows
 
 ## Discussion
 
-Feel free to join us on the #fourkeys channel on the [Google Cloud Platform Slack](https://goo.gle/gcp-slack)! 
+Feel free to join us on the #fourkeys channel on the [Google Cloud Platform Slack](https://goo.gle/gcp-slack)!
 
 ## Office Hours
 
-We host regular office hours for users needing help with installation, or for general discussion. 
+We host regular office hours for users needing help with installation, or for general discussion.
 
 Book an appointment on our [Four Keys Office Hours appointment calendar](https://bit.ly/fourkeys-officehours) -- feel free to book multiple slots if you have a lot of questions! When booking, please (briefly) list your questions in the "description" area.
 
 ## Meetups
 
-We'll be hosting quarterly meetups to discuss proposed changes, integrations, roadmaps, etc.  
+We'll be hosting quarterly meetups to discuss proposed changes, integrations, roadmaps, etc.
 
 Next Meetup TBD
 

@@ -7,7 +7,7 @@ MAX(time_resolved) as time_resolved,
 ARRAY_AGG(root_cause IGNORE NULLS) changes,
 FROM
 (
-SELECT 
+SELECT
 source,
 CASE WHEN source LIKE "github%" THEN JSON_EXTRACT_SCALAR(metadata, '$.issue.number')
      WHEN source LIKE "gitlab%" AND event_type = "note" THEN JSON_EXTRACT_SCALAR(metadata, '$.object_attributes.noteable_id')
@@ -27,7 +27,7 @@ CASE WHEN source LIKE "github%" THEN REGEXP_CONTAINS(JSON_EXTRACT(metadata, '$.i
      WHEN source LIKE "gitlab%" THEN REGEXP_CONTAINS(JSON_EXTRACT(metadata, '$.object_attributes.labels'), '"title":"Incident"')
      WHEN source LIKE "pagerduty%" THEN TRUE # All Pager Duty events are incident-related
      END AS bug,
-FROM four_keys.events_raw 
+FROM four_keys.events_raw
 WHERE event_type LIKE "issue%" OR event_type LIKE "incident%" OR (event_type = "note" and JSON_EXTRACT_SCALAR(metadata, '$.object_attributes.noteable_type') = 'Issue')
 ) issue
 LEFT JOIN (SELECT time_created, changes FROM four_keys.deployments d, d.changes) root on root.changes = root_cause

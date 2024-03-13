@@ -15,7 +15,7 @@
 steps:
 - # Build tekton worker image
   name: gcr.io/cloud-builders/docker:latest
-  args: ['build', 
+  args: ['build',
          '--tag=gcr.io/$PROJECT_ID/tekton-parser', '.']
   id: build
 

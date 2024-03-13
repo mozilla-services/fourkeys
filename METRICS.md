@@ -4,11 +4,11 @@ This page describes the calculation of each metric that the Four Keys dashboard 
 
 ![Image of the Four Keys dashboard.](images/dashboard.png)
 
-For each of the metrics, the dashboard shows a running daily calculation, as well as a 3 month bucketed view.  The  buckets are categorized per the [2019 State of DevOps Report](https://www.devops-research.com/research.html#reports). 
+For each of the metrics, the dashboard shows a running daily calculation, as well as a 3 month bucketed view.  The  buckets are categorized per the [2019 State of DevOps Report](https://www.devops-research.com/research.html#reports).
 
 ## Deployment Frequency ##
 
-**Definition**: How frequently a team successfully releases to production, e.g., daily, weekly, monthly, yearly. 
+**Definition**: How frequently a team successfully releases to production, e.g., daily, weekly, monthly, yearly.
 
 ### Daily Deployment Volumes ###
 ![Image of chart from the Four Keys dashboard, showing the daily deployment volume.](images/daily_deployments.png)
@@ -25,7 +25,7 @@ four_keys.deployments
 GROUP BY day;
 ```
 
-### Calculating the bucket ### 
+### Calculating the bucket ###
 ![Image of chart from the Four Keys dashboard, showing the deployment frequency.](images/deployment_frequency.png)
 
 Here we see more complexity.  The first thing to consider is that we need rows for the days with no deployments. To achieve this, we unpack a date array to join against our table, which will create Null values for days without deployments.
@@ -54,12 +54,12 @@ LEFT JOIN(
   FROM four_keys.deployments) deployments ON deployments.day = last_three_months.day;
 ```
 
-Now we have a full picture of the last three months and will use this to calculate the frequency.  To do this we have to decide what each bucket means.  
+Now we have a full picture of the last three months and will use this to calculate the frequency.  To do this we have to decide what each bucket means.
 
 - **Daily**: Over the last three months, the median number of days per week with deployments is equal to or greater than three; ie, most working days have deployments.
 - **Weekly**: Over the last three months, the median number of days per week with deployments is at least 1; ie, most weeks have at least one deployment.
 - **Monthly**:  Over the last three months, the median number of deployments per month is at least 1; ie, most months have at least one deployment.
-- **Yearly**: Any frequency slower than Monthly.  This is the else statement and will default to Yearly if the above conditions are not met. 
+- **Yearly**: Any frequency slower than Monthly.  This is the else statement and will default to Yearly if the above conditions are not met.
 
 ```sql
 WITH last_three_months AS
@@ -75,10 +75,10 @@ WHERE day > (SELECT date(min(time_created)) FROM four_keys.events_raw)
 )
 
 SELECT
-CASE WHEN daily THEN "Daily" 
-     WHEN weekly THEN "Weekly" 
+CASE WHEN daily THEN "Daily"
+     WHEN weekly THEN "Weekly"
       # If at least one per month, then Monthly
-     WHEN PERCENTILE_CONT(monthly_deploys, 0.5) OVER () >= 1 THEN  "Monthly" 
+     WHEN PERCENTILE_CONT(monthly_deploys, 0.5) OVER () >= 1 THEN  "Monthly"
      ELSE "Yearly"
      END as deployment_frequency
 FROM (
@@ -88,7 +88,7 @@ FROM (
   # If most weeks have a deployment, then Weekly
   PERCENTILE_CONT(week_deployed, 0.5) OVER() >= 1 AS weekly,
 
-  # Count the number of deployments per month.  
+  # Count the number of deployments per month.
   # Cannot mix aggregate and analytic functions, so calculate the median in the outer select statement
   SUM(week_deployed) OVER(partition by TIMESTAMP_TRUNC(week, MONTH)) monthly_deploys
   FROM(
@@ -127,7 +127,7 @@ FROM four_keys.deployments d, d.changes
 LEFT JOIN four_keys.changes c ON changes = c.change_id;
 ```
 
-From this base, we want to extract the daily median lead time to change. 
+From this base, we want to extract the daily median lead time to change.
 
 ```sql
 SELECT
@@ -138,7 +138,7 @@ FROM (
     day,
     PERCENTILE_CONT(
       # Ignore automated changes
-      IF(time_to_change_minutes > 0, time_to_change_minutes, NULL), 
+      IF(time_to_change_minutes > 0, time_to_change_minutes, NULL),
       0.5) # Median
       OVER (partition by day) AS median_time_to_change
   FROM (
@@ -175,15 +175,15 @@ FROM (
 GROUP BY day ORDER BY day;
 ```
 
-Automated changes are excluded from this metric.  This is a subject up for debate. Our rationale is that when we merge a Pull Request it creates a Push event in the main branch.  This Push event is not its own distinct change, but rather a link in the workflow.  If we trigger a deployment off of this push event, this artificially skews the metrics and does not give us a clear picture of developer velocity. 
+Automated changes are excluded from this metric.  This is a subject up for debate. Our rationale is that when we merge a Pull Request it creates a Push event in the main branch.  This Push event is not its own distinct change, but rather a link in the workflow.  If we trigger a deployment off of this push event, this artificially skews the metrics and does not give us a clear picture of developer velocity.
 
 ### Calculating the bucket ###
 ![Image of chart from the Four Keys dashboard, showing the median Lead Time to Change.](images/lead_time.png)
 
-To get the buckets, rather than aggregating daily, we look at the last 3 months and bucket the results according to the DORA research. 
+To get the buckets, rather than aggregating daily, we look at the last 3 months and bucket the results according to the DORA research.
 
 ```sql
-SELECT 
+SELECT
   CASE
     WHEN median_time_to_change < 24 * 60 then "One day"
     WHEN median_time_to_change < 168 * 60 then "One week"
@@ -210,7 +210,7 @@ FROM (
 
 ## Time to Restore Services ##
 
-**Definition**: For a failure, the median amount of time between the deployment which caused the failure and the remediation. The remediation is measured by closing an associated bug / incident report.  The timestamps in the `four_keys.incidents` table should align with these events, whenever available.  
+**Definition**: For a failure, the median amount of time between the deployment which caused the failure and the remediation. The remediation is measured by closing an associated bug / incident report.  The timestamps in the `four_keys.incidents` table should align with these events, whenever available.
 
 ### Daily Median Time to Restore Services ###
 ![Image of chart from the Four Keys dashboard, showing the daily MTTR.](images/daily_mttr.png)
@@ -286,7 +286,7 @@ SELECT
 CASE WHEN change_fail_rate <= .15 then "0-15%"
      WHEN change_fail_rate < .46 then "16-45%"
      ELSE "46-60%" end as change_fail_rate
-FROM 
+FROM
  (SELECT
   SUM(IF(i.incident_id is NULL, 0, 1)) / COUNT(DISTINCT deploy_id) as change_fail_rate
   FROM four_keys.deployments d, d.changes

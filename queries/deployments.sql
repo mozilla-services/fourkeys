@@ -1,7 +1,7 @@
 # Deployments Table
 
 WITH deploys_cloudbuild_github_gitlab AS (# Cloud Build, Github, Gitlab pipelines
-      SELECT 
+      SELECT
       source,
       id as deploy_id,
       time_created,
@@ -20,15 +20,15 @@ WITH deploys_cloudbuild_github_gitlab AS (# Cloud Build, Github, Gitlab pipeline
                 SELECT JSON_EXTRACT_SCALAR(string_element, '$')
                 FROM UNNEST(JSON_EXTRACT_ARRAY(metadata, '$.deployment.additional_sha')) AS string_element)
            ELSE ARRAY<string>[] end as additional_commits
-      FROM four_keys.events_raw 
+      FROM four_keys.events_raw
       WHERE (
       # Cloud Build Deployments
          (source = "cloud_build" AND JSON_EXTRACT_SCALAR(metadata, '$.status') = "SUCCESS")
       # GitHub Deployments
       OR (source LIKE "github%" and event_type = "deployment_status" and JSON_EXTRACT_SCALAR(metadata, '$.deployment_status.state') = "success")
-      # GitLab Pipelines 
+      # GitLab Pipelines
       OR (source LIKE "gitlab%" AND event_type = "pipeline" AND JSON_EXTRACT_SCALAR(metadata, '$.object_attributes.status') = "success")
-      # GitLab Deployments 
+      # GitLab Deployments
       OR (source LIKE "gitlab%" AND event_type = "deployment" AND JSON_EXTRACT_SCALAR(metadata, '$.status') = "success")
       # ArgoCD Deployments
       OR (source = "argocd" AND JSON_EXTRACT_SCALAR(metadata, '$.status') = "SUCCESS")
@@ -42,13 +42,13 @@ WITH deploys_cloudbuild_github_gitlab AS (# Cloud Build, Github, Gitlab pipeline
       IF(JSON_EXTRACT_SCALAR(param, '$.name') = "gitrevision", JSON_EXTRACT_SCALAR(param, '$.value'), Null) as main_commit,
       ARRAY<string>[] AS additional_commits
       FROM (
-      SELECT 
+      SELECT
       id,
       TIMESTAMP_TRUNC(time_created, second) as time_created,
       source,
       four_keys.json2array(JSON_EXTRACT(metadata, '$.data.pipelineRun.spec.params')) params
       FROM four_keys.events_raw
-      WHERE event_type = "dev.tekton.event.pipelinerun.successful.v1" 
+      WHERE event_type = "dev.tekton.event.pipelinerun.successful.v1"
       AND metadata like "%gitrevision%") e, e.params as param
     ),
     deploys_circleci AS (# CircleCI pipelines
@@ -91,12 +91,12 @@ WITH deploys_cloudbuild_github_gitlab AS (# Cloud Build, Github, Gitlab pipeline
         )
     )
 
-    SELECT 
+    SELECT
     source,
     deploy_id,
     time_created,
-    main_commit,   
-    ARRAY_AGG(DISTINCT JSON_EXTRACT_SCALAR(array_commits, '$.id')) changes,    
+    main_commit,
+    ARRAY_AGG(DISTINCT JSON_EXTRACT_SCALAR(array_commits, '$.id')) changes,
     FROM deployment_changes
     CROSS JOIN deployment_changes.array_commits
     GROUP BY 1,2,3,4;

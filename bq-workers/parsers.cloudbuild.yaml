@@ -16,7 +16,7 @@ steps:
 - # Build parser image
   name: gcr.io/cloud-builders/docker:latest
   dir: ${_SERVICE}-parser
-  args: ['build', 
+  args: ['build',
          '--tag=gcr.io/$PROJECT_ID/${_SERVICE}-parser:${_TAG}', '.']
   id: build
 
