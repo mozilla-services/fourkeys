@@ -6,7 +6,7 @@ WITH
       CASE
         WHEN source LIKE "github%" THEN JSON_EXTRACT_SCALAR(metadata, '$.repository.full_name')
       END
-        AS service,
+        AS metadata_service,
       id AS deploy_id,
       time_created,
       CASE
@@ -22,7 +22,7 @@ WITH
       END
         AS additional_commits
     FROM
-      four_keys.events_raw
+      `four_keys.events_raw`
     WHERE
       (
         -- Cloud Build Deployments
@@ -33,36 +33,71 @@ WITH
         OR (source = "argocd" AND JSON_EXTRACT_SCALAR(metadata, '$.status') = "SUCCESS")
       )
   ),
+  deploys_with_service AS (
+    SELECT
+      deploys.*,
+      service_catalog.service,
+    FROM
+      deploys
+    LEFT JOIN
+      `four_keys.services` AS service_catalog
+    ON
+      CASE
+        WHEN deploys.source = "pagerduty" THEN deploys.metadata_service = service_catalog.pagerduty_service
+        WHEN deploys.source = "github" THEN deploys.metadata_service = service_catalog.github_repository
+        ELSE FALSE
+      END
+  ),
   changes_raw AS (
     SELECT
+      source,
       id,
       metadata AS change_metadata,
       CASE
         WHEN source LIKE "github%" THEN JSON_EXTRACT_SCALAR(metadata, '$.repository.full_name')
       END
-        AS service
+        AS metadata_service
     FROM
-      four_keys.events_raw
+      `four_keys.events_raw`
+  ),
+  changes_raw_with_service AS (
+    SELECT
+      changes_raw.*,
+      service_catalog.service,
+    FROM
+      changes_raw
+    LEFT JOIN
+      `four_keys.services` AS service_catalog
+    ON
+      CASE
+        WHEN changes_raw.source = "pagerduty" THEN changes_raw.metadata_service = service_catalog.pagerduty_service
+        WHEN changes_raw.source = "github" THEN changes_raw.metadata_service = service_catalog.github_repository
+        ELSE FALSE
+      END
   ),
   deployment_changes AS (
     SELECT
-      source,
+      deploys.source,
       deploys.service,
+      deploys.metadata_service as deploys_service,
+      changes_raw.metadata_service as changes_service,
       deploy_id,
       deploys.time_created time_created,
       change_metadata,
       four_keys.json2array(JSON_EXTRACT(change_metadata, '$.commits')) AS array_commits,
       main_commit
     FROM
-      deploys
+      deploys_with_service as deploys
     JOIN
-      changes_raw
+      changes_raw_with_service as changes_raw
     ON
       ( changes_raw.service = deploys.service ) AND ( changes_raw.id = deploys.main_commit OR changes_raw.id IN UNNEST(deploys.additional_commits) )
   )
 SELECT
   source,
   service,
+  deploys_service,
+  changes_service,
   deploy_id,
   time_created,
   main_commit,
@@ -76,4 +111,6 @@ GROUP BY
   2,
   3,
   4,
-  5;
+  5,
+  6,
+  7;

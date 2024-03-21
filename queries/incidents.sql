@@ -1,7 +1,8 @@
 -- Incidents View
 SELECT
   source,
-  service,
+  metadata_service,
+  service_catalog.service,
   incident_id,
   MIN(IF(root.time_created < issue.time_created, root.time_created, issue.time_created)) AS time_created,
   MAX(time_resolved) AS time_resolved,
@@ -13,7 +14,7 @@ FROM (
       WHEN source LIKE "github%" THEN JSON_EXTRACT_SCALAR(metadata, '$.repository.full_name')
       WHEN source LIKE "pagerduty%" THEN JSON_EXTRACT_SCALAR(metadata, '$.event.data.service.summary')
     END
-      AS service,
+      AS metadata_service,
     CASE
       WHEN source LIKE "github%" THEN JSON_EXTRACT_SCALAR(metadata, '$.issue.number')
       WHEN source LIKE "pagerduty%" THEN JSON_EXTRACT_SCALAR(metadata, '$.event.data.id')
@@ -42,19 +43,29 @@ FROM (
     OR event_type LIKE "incident%"
     OR (event_type = "note" AND JSON_EXTRACT_SCALAR(metadata, '$.object_attributes.noteable_type') = 'Issue')
 ) AS issue
+LEFT JOIN
+  `four_keys.services` AS service_catalog
+ON
+  CASE
+    WHEN issue.source = "pagerduty" THEN issue.metadata_service = service_catalog.pagerduty_service
+    WHEN issue.source = "github" THEN issue.metadata_service = service_catalog.github_repository
+    ELSE FALSE
+  END
 LEFT JOIN (
   SELECT
     time_created,
-    changes
+    changes,
+    service
   FROM
     four_keys.deployments d,
     d.changes
 ) AS root
 ON
-  root.changes = root_cause
+  ( service_catalog.service = root.service AND root_cause = root.changes )
 GROUP BY
   1,
   2,
-  3
+  3,
+  4
 HAVING
   MAX(bug) IS TRUE ;
