@@ -83,3 +83,9 @@ variable "pagerduty_parser_url" {
   description = "The URL for the Pager Duty parser container image. A default value pointing to the project's container registry is defined in under local values of this module."
   default     = ""
 }
+
+variable "ingress_type" {
+  type        = string
+  description = "Set the ingress traffic sources allowed to call the service. Can be set to \"internal-and-cloud-load-balancing\" to use a provisioned application load balancer infront of the event-handler service"
+  default     = "all"
+}
