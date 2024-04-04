@@ -7,6 +7,10 @@ WITH
         WHEN source LIKE "github%" THEN JSON_EXTRACT_SCALAR(metadata, '$.repository.full_name')
       END
         AS metadata_service,
+      CASE
+        WHEN source LIKE "github%" THEN JSON_EXTRACT_SCALAR(metadata, '$.deployment_status.environment')
+      END
+        AS metadata_environment,
       id AS deploy_id,
       time_created,
       CASE
@@ -81,6 +85,7 @@ WITH
       deploys.service,
       deploys.metadata_service as deploys_service,
       changes_raw.metadata_service as changes_service,
+      deploys.metadata_environment as environment,
       deploy_id,
       deploys.time_created time_created,
       change_metadata,
@@ -98,6 +103,7 @@ SELECT
   service,
   deploys_service,
   changes_service,
+  environment,
   deploy_id,
   time_created,
   main_commit,
@@ -113,4 +119,5 @@ GROUP BY
   4,
   5,
   6,
-  7;
+  7,
+  8;
