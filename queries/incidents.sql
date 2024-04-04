@@ -4,6 +4,7 @@ SELECT
   metadata_service,
   service_catalog.service,
   incident_id,
+  root.environment as deployment_environment,
   MIN(IF(root.time_created < issue.time_created, root.time_created, issue.time_created)) AS time_created,
   MAX(time_resolved) AS time_resolved,
   ARRAY_AGG(root_cause IGNORE NULLS) AS changes,
@@ -55,7 +56,8 @@ LEFT JOIN (
   SELECT
     time_created,
     changes,
-    service
+    service,
+    environment
   FROM
     four_keys.deployments d,
     d.changes
@@ -66,6 +68,7 @@ GROUP BY
   1,
   2,
   3,
-  4
+  4,
+  5
 HAVING
   MAX(bug) IS TRUE ;
