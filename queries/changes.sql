@@ -33,7 +33,6 @@ LEFT JOIN
   `four_keys.services` AS service_catalog
 ON
   CASE
-    WHEN pushes.source = "pagerduty" THEN pushes.metadata_service = service_catalog.pagerduty_service
     WHEN pushes.source = "github" THEN pushes.metadata_service = service_catalog.github_repository
     ELSE FALSE
   END
