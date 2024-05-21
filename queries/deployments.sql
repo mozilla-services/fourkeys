@@ -47,7 +47,6 @@ WITH
       `four_keys.services` AS service_catalog
     ON
       CASE
-        WHEN deploys.source = "pagerduty" THEN deploys.metadata_service = service_catalog.pagerduty_service
         WHEN deploys.source = "github" THEN deploys.metadata_service = service_catalog.github_repository
         ELSE FALSE
       END
@@ -74,7 +73,6 @@ WITH
       `four_keys.services` AS service_catalog
     ON
       CASE
-        WHEN changes_raw.source = "pagerduty" THEN changes_raw.metadata_service = service_catalog.pagerduty_service
         WHEN changes_raw.source = "github" THEN changes_raw.metadata_service = service_catalog.github_repository
         ELSE FALSE
       END
