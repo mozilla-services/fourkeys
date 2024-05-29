@@ -1,6 +1,6 @@
 -- Incidents View
 WITH
-  issue AS (
+  github_pagerduty AS (
     SELECT
       source,
       CASE
@@ -35,6 +35,23 @@ WITH
       event_type LIKE "issue%"
       OR event_type LIKE "incident%"
       OR (event_type = "note" AND JSON_EXTRACT_SCALAR(metadata, '$.object_attributes.noteable_type') = 'Issue')
+  ),
+  issue AS (
+    SELECT
+      *
+    FROM
+      github_pagerduty
+    UNION ALL
+    SELECT
+      source,
+      github_repo AS metadata_service,
+      incident_id,
+      time_created,
+      time_resolved,
+      root_cause,
+      TRUE as bug,
+    FROM
+      `four_keys.incidents_google_form`
   )
 SELECT
   source,
@@ -53,6 +70,7 @@ ON
   CASE
     WHEN issue.source = "pagerduty" THEN issue.metadata_service = service_catalog.pagerduty_service
     WHEN issue.source = "github" THEN issue.metadata_service = service_catalog.github_repository
+    WHEN issue.source = "google_form" THEN issue.metadata_service = service_catalog.github_repository
     ELSE FALSE
   END
 LEFT JOIN (
