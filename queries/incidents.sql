@@ -38,7 +38,8 @@ WITH
   ),
   issue AS (
     SELECT
-      *
+      *,
+      NULL as deployment_environment  -- Remove this once we collect deployment_environment
     FROM
       github_pagerduty
     UNION ALL
@@ -50,6 +51,7 @@ WITH
       time_resolved,
       root_cause,
       TRUE as bug,
+      deployment_environment,  -- This is expected to always be `production`
     FROM
       `four_keys.incidents_google_form`
   )
@@ -80,11 +82,16 @@ LEFT JOIN (
     service,
     environment
   FROM
-    four_keys.deployments d,
+    `four_keys.deployments` AS d,
     d.changes
 ) AS root
 ON
-  ( service_catalog.service = root.service AND root_cause = root.changes )
+  service_catalog.service = root.service
+  AND root_cause = root.changes
+  -- GitHub and PagerDuty incidents don't contain information about the environment.
+  -- Google Form incidents are always reported for the `production` environment.
+  -- The following ensures we don't correlate incidents with `staging` deployments.
+  AND issue.deployment_environment = root.environment
 GROUP BY
   1,
   2,
