@@ -1,5 +1,14 @@
 -- Deployments View: For GitHub `deploy_id` is the ID of the Deployment Status.
 WITH
+  github_repositories AS (
+    SELECT
+      github_repository,
+      COUNT(DISTINCT service) AS count_services,
+    FROM
+      `four_keys.services`
+    GROUP BY
+      1
+  ),
   deploys AS (  -- Cloud Build, GitHub, ArgoCD
     SELECT
       source,
@@ -46,10 +55,27 @@ WITH
     FROM
       deploys
     LEFT JOIN
+      github_repositories
+    ON
+      CASE
+        WHEN deploys.source = "github" THEN deploys.metadata_service = github_repositories.github_repository
+        ELSE FALSE
+      END
+    LEFT JOIN
       `four_keys.services` AS service_catalog
     ON
       CASE
-        WHEN deploys.source = "github" THEN deploys.metadata_service = service_catalog.github_repository
+        WHEN
+          deploys.source = "github"
+          AND github_repositories.count_services > 1 -- there's more than 1 service in our catalog linked to this GitHub repo.
+          AND metadata_environment LIKE '%:%'  -- the GitHub deployment environment name follows the '%:%' format.
+        THEN
+          deploys.metadata_service = service_catalog.github_repository
+          AND SPLIT(metadata_environment, ':')[OFFSET(0)] = service_catalog.service
+        WHEN
+          deploys.source = "github"
+        THEN
+          deploys.metadata_service = service_catalog.github_repository
         ELSE FALSE
       END
   ),
