@@ -41,6 +41,8 @@ WITH
     SELECT
       deploys.*,
       service_catalog.service,
+      service_catalog.production_env,
+      service_catalog.staging_env,
     FROM
       deploys
     LEFT JOIN
@@ -83,7 +85,12 @@ WITH
       deploys.service,
       deploys.metadata_service as deploys_service,
       changes_raw.metadata_service as changes_service,
-      deploys.metadata_environment as environment,
+      CASE
+        WHEN deploys.metadata_environment = production_env THEN "production"
+        WHEN deploys.metadata_environment = staging_env THEN "staging"
+        ELSE deploys.metadata_environment
+      END
+        AS environment,
       deploy_id,
       deploys.time_created time_created,
       change_metadata,
