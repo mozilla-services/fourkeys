@@ -3,6 +3,12 @@ resource "google_cloud_run_service" "event_handler" {
   project  = var.project_id
   location = var.region
 
+  metadata {
+    annotations = {
+      "run.googleapis.com/ingress" = var.ingress_type
+    }
+  }
+
   template {
     spec {
       containers {
