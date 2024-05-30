@@ -87,7 +87,9 @@ LEFT JOIN (
 ) AS root
 ON
   service_catalog.service = root.service
-  AND root_cause = root.changes
+  -- root.changes are full Git Commit SHAs in deployment_status events.
+  -- root_cause are either full or abbreviated Git Commit SHAs in incident events.
+  AND STARTS_WITH(root.changes, root_cause)
   -- GitHub and PagerDuty incidents don't contain information about the environment.
   -- Google Form incidents are always reported for the `production` environment.
   -- The following ensures we don't correlate incidents with `staging` deployments.
