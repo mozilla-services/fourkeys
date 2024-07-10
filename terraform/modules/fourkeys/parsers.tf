@@ -1,3 +1,16 @@
+module "argocd_parser" {
+  source                         = "../fourkeys-argocd-parser"
+  count                          = contains(var.parsers, "argocd") ? 1 : 0
+  project_id                     = var.project_id
+  parser_container_url           = local.argocd_parser_url
+  region                         = var.region
+  fourkeys_service_account_email = google_service_account.fourkeys.email
+  enable_apis                    = var.enable_apis
+  depends_on = [
+    time_sleep.wait_for_services
+  ]
+}
+
 module "circleci_parser" {
   source                         = "../fourkeys-circleci-parser"
   count                          = contains(var.parsers, "circleci") ? 1 : 0
