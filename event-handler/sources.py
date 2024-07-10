@@ -168,6 +168,6 @@ AUTHORIZED_SOURCES = {
         "X-Pagerduty-Signature", pagerduty_verification
         ),
     "argocd": EventSource(
-        "Argo-Signature", simple_token_verification
+        "X-ArgoCD-Token", simple_token_verification
         ),
 }
