@@ -1,0 +1,24 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "pip"
+    directories:
+      - "/"
+      - "/data-generator"
+      - "/event-handler"
+      - "/bq-workers/*"
+    schedule:
+      interval: "weekly"
+    reviewers:
+      - "mozilla-services/rapid-release-model"
+  - package-ecosystem: "docker"
+    schedule:
+      interval: "weekly"
+    directories:
+    - "/bq-workers/*"
+    - "/dashboard"
+    - "/event-handler"
+    - "/setup/fourkeys-builder"
