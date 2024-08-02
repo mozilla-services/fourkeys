@@ -103,25 +103,10 @@ def _determine_local_import_names(start_dir):
     ]
 
 
-FLAKE8_COMMON_ARGS = [
-    "--show-source",
-    "--builtin=gettext",
-    "--max-complexity=20",
-    "--import-order-style=google",
-    "--exclude=.nox,.cache,env,lib,generated_pb2,*_pb2.py,*_pb2_grpc.py",
-    "--ignore=E121,E123,E126,E203,E226,E24,E266,E501,E704,W503,W504,I100,I201,I202",
-    "--max-line-length=88",
-]
-
-
 @nox.session
 def lint(session):
-    session.install("flake8", "flake8-import-order")
+    session.install("ruff")
+    session.run("ruff", "format", "--check", ".")
+    session.run("ruff", "check", ".")
 
-    local_names = _determine_local_import_names(".")
-    args = FLAKE8_COMMON_ARGS + [
-        "--application-import-names",
-        ",".join(local_names),
-        ".",
-    ]
-    session.run("flake8", *args)
+
