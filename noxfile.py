@@ -110,3 +110,10 @@ def lint(session):
     session.run("ruff", "check", ".")
 
 
+@nox.session
+def format(session):
+    session.install("ruff")
+    session.run("ruff", "format", ".")
+    session.run("ruff", "check", ".", "--fix")
+
+
