@@ -17,7 +17,7 @@ from hashlib import sha1
 
 import event_handler
 
-import mock
+from unittest import mock
 import pytest
 
 
