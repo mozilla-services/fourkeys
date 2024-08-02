@@ -14,12 +14,12 @@
 
 import base64
 import json
+from unittest import mock
 
-import main
+import pytest
 import shared
 
-from unittest import mock
-import pytest
+import main
 
 
 @pytest.fixture
