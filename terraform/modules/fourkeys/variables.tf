@@ -21,7 +21,7 @@ variable "bigquery_region" {
 
 variable "parsers" {
   type        = list(string)
-  description = "List of data parsers to configure. Acceptable values are: 'github', 'gitlab', 'cloud-build', 'tekton', 'circleci', 'pagerduty'"
+  description = "List of data parsers to configure. Acceptable values are: 'argocd', 'github', 'gitlab', 'cloud-build', 'tekton', 'circleci', 'pagerduty'"
 }
 
 variable "enable_apis" {
@@ -45,6 +45,12 @@ variable "event_handler_container_url" {
 variable "dashboard_container_url" {
   type        = string
   description = "The URL for the dashboard container image. A default value pointing to the project's container registry is defined in under local values of this module."
+  default     = ""
+}
+
+variable "argocd_parser_url" {
+  type        = string
+  description = "The URL for the ArgoCD parser container image. A default value pointing to the project's container registry is defined in under local values of this module."
   default     = ""
 }
 
