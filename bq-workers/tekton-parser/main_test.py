@@ -20,7 +20,7 @@ import shared
 
 from cloudevents.http import CloudEvent, to_structured
 
-import mock
+from unittest import mock
 import pytest
 
 
