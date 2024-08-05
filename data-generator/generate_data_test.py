@@ -140,7 +140,7 @@ def valid_issue(vcs):
                 "labels": [{"name": "Incident"}],
                 "body": "root cause: 2b04b6d3939608f19776193697e0e30c04d9c6b8",
             },
-            "repository": {"name": "foobar"},
+            "repository": {"name": "foobar", "full_name": "some-org/foobar"},
         }
     elif vcs == "gitlab":
         return {

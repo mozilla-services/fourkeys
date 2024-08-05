@@ -212,7 +212,7 @@ def make_github_issue(root_cause):
             "labels": [{"name": "Incident"}],
             "body": "root cause: %s" % root_cause["id"],
         },
-        "repository": {"name": "foobar"},
+        "repository": {"name": "foobar", "full_name": "some-org/foobar"},
     }
     return event
 

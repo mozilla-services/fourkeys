@@ -22,10 +22,19 @@ from unittest import mock
 import pytest
 
 
+@pytest.fixture(autouse=True)
+def _set_app_installations_config(monkeypatch):
+    monkeypatch.setenv(
+        "APP_INSTALLATIONS_CONFIG_PATH",
+        "data/app-installations.txt.example",
+    )
+
+
 @pytest.fixture
 def client():
-    main.app.testing = True
-    return main.app.test_client()
+    app = main.create_app()
+    app.testing = True
+    return app.test_client()
 
 
 def test_not_json(client):
@@ -55,6 +64,33 @@ def test_missing_msg_attributes(client):
         )
 
     assert "Missing pubsub attributes" in str(e.value)
+
+
+def test_duplicate_message_filtered(client, capsys):
+    headers = {
+        "X-Github-Event": "push",
+        "X-Hub-Signature": "foo",
+        "X-GitHub-Hook-Installation-Target-Type": "repository",
+    }
+    commit = json.dumps({"repository": {"full_name": "org/repo"}}).encode("utf-8")
+    pubsub_msg = {
+        "message": {
+            "data": base64.b64encode(commit).decode("utf-8"),
+            "attributes": {"headers": json.dumps(headers)},
+            "message_id": "foobar",
+        },
+    }
+
+    client.post(
+        "/",
+        data=json.dumps(pubsub_msg),
+        headers={"Content-Type": "application/json"},
+    )
+    stdout = capsys.readouterr().out
+    assert (
+        "Event data duplicated by app-configured webhook"
+        == json.loads(stdout)["errors"]
+    )
 
 
 def test_github_event_processed(client):

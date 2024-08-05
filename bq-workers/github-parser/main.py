@@ -13,17 +13,19 @@
 # limitations under the License.
 
 import base64
-import os
 import json
+import os
 
 import shared
 
-from flask import Flask, request
+from flask import Blueprint, Flask, request
 
-app = Flask(__name__)
+APP_INSTALLATIONS = None
+
+app_blueprint = Blueprint("app_blueprint", __name__)
 
 
-@app.route("/", methods=["POST"])
+@app_blueprint.route("/", methods=["POST"])
 def index():
     """
     Receives messages from a push subscription from Pub/Sub.
@@ -86,6 +88,12 @@ def process_github_event(headers, msg):
 
     metadata = json.loads(base64.b64decode(msg["data"]).decode("utf-8").strip())
 
+    # Filter out messages that are duplicated by app webhooks
+    webhook_type = headers.get("X-GitHub-Hook-Installation-Target-Type")
+    if webhook_type and webhook_type == "repository":
+        if metadata["repository"]["full_name"] in APP_INSTALLATIONS:
+            raise Exception("Event data duplicated by app-configured webhook")
+
     if event_type == "push":
         time_created = metadata["head_commit"]["timestamp"]
         e_id = metadata["head_commit"]["id"]
@@ -146,9 +154,22 @@ def process_github_event(headers, msg):
     return github_event
 
 
+def create_app():
+    app = Flask(__name__)
+    app.register_blueprint(app_blueprint)
+
+    APP_INSTALLATIONS_CONFIG_PATH = os.environ["APP_INSTALLATIONS_CONFIG_PATH"]
+    with open(APP_INSTALLATIONS_CONFIG_PATH, encoding="utf-8") as f:
+        global APP_INSTALLATIONS
+        APP_INSTALLATIONS = set(f.read().splitlines())
+
+    return app
+
+
 if __name__ == "__main__":
     PORT = int(os.getenv("PORT")) if os.getenv("PORT") else 8080
 
     # This is used when running locally. Gunicorn is used to run the
     # application on Cloud Run. See entrypoint in Dockerfile.
+    app = create_app()
     app.run(host="127.0.0.1", port=PORT, debug=True)
