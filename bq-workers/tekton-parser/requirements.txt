@@ -1,6 +1,6 @@
 Flask==3.0.3
-gunicorn==20.1.0
-google-cloud-bigquery==1.23.1
+gunicorn==22.0.0
+google-cloud-bigquery==3.25.0
 cloudevents==1.2.0
 git+https://github.com/mozilla-services/fourkeys.git#egg=shared&subdirectory=shared
-protobuf==3.20.2
+protobuf==5.27.3

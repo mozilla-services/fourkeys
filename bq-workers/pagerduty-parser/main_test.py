@@ -18,7 +18,7 @@ import json
 import main
 import shared
 
-import mock
+from unittest import mock
 import pytest
 
 
