@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
 import datetime
-
 from urllib.request import Request
 
-from util_compare_dicts import compare_dicts
-
 import generate_data
+import pytest
+from util_compare_dicts import compare_dicts
 
 
 @pytest.fixture
@@ -67,7 +65,6 @@ def make_change_request(vcs, generate_changes):
 
 @pytest.fixture
 def valid_changes(vcs):
-
     # return an example of what valid data looks like
     if vcs == "github":
         return {
@@ -108,7 +105,6 @@ def valid_changes(vcs):
 
 @pytest.fixture
 def valid_deployment(vcs):
-
     if vcs == "github":
         return {
             "deployment_status": {
@@ -158,7 +154,6 @@ def valid_issue(vcs):
 
 @pytest.fixture
 def valid_change_request(vcs, generate_changes):
-
     request = Request(
         url="http://dummy_url",
         data=generate_changes,
@@ -205,16 +200,21 @@ def test_request(valid_change_request, make_change_request):
 def test_all_changesets_linked_with_before_attribute(generate_all_changesets):
     all_changesets = generate_all_changesets
     for i in range(1, len(all_changesets)):
-        prev_change_sha = (all_changesets[i - 1].get("checkout_sha")
-                           or all_changesets[i - 1].get("head_commit", {}).get("id"))
+        prev_change_sha = all_changesets[i - 1].get("checkout_sha") or all_changesets[
+            i - 1
+        ].get("head_commit", {}).get("id")
         assert all_changesets[i]["before"] == prev_change_sha
 
 
 @pytest.mark.parametrize("vcs", ["github", "gitlab"])
-def test_ind_change_from_changeset_linked_with_before_attribute(vcs, generate_all_changesets):
+def test_ind_change_from_changeset_linked_with_before_attribute(
+    vcs, generate_all_changesets
+):
     for changeset in generate_all_changesets:
         ind_changes = generate_data.make_ind_changes_from_changeset(changeset, vcs)
 
         for i in range(1, len(ind_changes)):
-            prev_change_sha = ind_changes[i - 1].get("checkout_sha") or ind_changes[i - 1].get("head_commit", {}).get("id")
+            prev_change_sha = ind_changes[i - 1].get("checkout_sha") or ind_changes[
+                i - 1
+            ].get("head_commit", {}).get("id")
             assert ind_changes[i]["before"] == prev_change_sha

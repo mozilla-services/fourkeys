@@ -69,12 +69,7 @@ def insert_row_into_events_enriched(event):
         table = client.get_table(table_ref)
 
         # Insert row
-        row_to_insert = [
-            (
-                event["events_raw_signature"],
-                event["enriched_metadata"]
-            )
-        ]
+        row_to_insert = [(event["events_raw_signature"], event["enriched_metadata"])]
         bq_errors = client.insert_rows(table, row_to_insert)
 
         # If errors, log to Stackdriver

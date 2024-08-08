@@ -16,10 +16,9 @@ import json
 import os
 import sys
 
-from flask import abort, Flask, request
-from google.cloud import pubsub_v1
-
 import sources
+from flask import Flask, abort, request
+from google.cloud import pubsub_v1
 
 PROJECT_NAME = os.environ.get("PROJECT_NAME")
 
@@ -76,9 +75,7 @@ def publish_to_pubsub(source, msg, headers):
         print(topic_path)
 
         # Pub/Sub data must be bytestring, attributes must be strings
-        future = publisher.publish(
-            topic_path, data=msg, headers=json.dumps(headers)
-        )
+        future = publisher.publish(topic_path, data=msg, headers=json.dumps(headers))
 
         exception = future.exception()
         if exception:

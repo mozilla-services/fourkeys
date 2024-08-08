@@ -13,11 +13,10 @@
 # limitations under the License.
 
 import base64
-import os
 import json
+import os
 
 import shared
-
 from flask import Flask, request
 
 app = Flask(__name__)
@@ -52,11 +51,11 @@ def index():
 
     except Exception as e:
         entry = {
-                "severity": "WARNING",
-                "msg": "Data not saved to BigQuery",
-                "errors": str(e),
-                "json_payload": envelope
-            }
+            "severity": "WARNING",
+            "msg": "Data not saved to BigQuery",
+            "errors": str(e),
+            "json_payload": envelope,
+        }
         print(f"EXCEPTION raised  {json.dumps(entry)}")
     return "", 204
 
@@ -68,7 +67,7 @@ def process_pagerduty_event(msg):
 
     # Unique hash for the event
     signature = shared.create_unique_id(msg)
-    event = metadata['event']
+    event = metadata["event"]
     event_type = event["event_type"]
     types = {"incident.triggered", "incident.resolved"}
     if event_type not in types:
@@ -76,13 +75,15 @@ def process_pagerduty_event(msg):
 
     pagerduty_event = {
         "event_type": event_type,  # Event type, eg "incident.trigger", "incident.resolved", etc
-        "id": event['id'],  # Event ID,
+        "id": event["id"],  # Event ID,
         "metadata": json.dumps(metadata),  # The body of the msg
         "signature": signature,  # The unique event signature
         "msg_id": msg["message_id"],  # The pubsub message id
-        "time_created" : event['occurred_at'],  # The timestamp of with the event resolved
+        "time_created": event[
+            "occurred_at"
+        ],  # The timestamp of with the event resolved
         "source": "pagerduty",  # The name of the source, eg "pagerduty"
-        }
+    }
 
     print(f"Pager Duty event to metrics--------> {pagerduty_event}")
     return pagerduty_event
