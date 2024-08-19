@@ -38,7 +38,7 @@ jobs:
 
       - name: build ${{ matrix.context }} parser image
         id: build-and-push-parser
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: bq-workers/${{ matrix.context }}-parser
           tags: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ matrix.context }}-parser:${{ env.REF }}
@@ -72,7 +72,7 @@ jobs:
           password: ${{ steps.gcp-auth.outputs.access_token }}
 
       - id: build-and-push-event-handler
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           context: event-handler/
           tags: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/event-handler:${{ env.REF }}
