@@ -30,7 +30,7 @@ jobs:
         with:
           token_format: 'access_token'
           service_account: artifact-writer@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_POOL_PROJECT_NUMBER }}
+          workload_identity_provider: ${{ vars.GCPV2_GITHUB_WORKLOAD_IDENTITY_PROVIDER }}
 
       - uses: docker/login-action@v3
         name: Docker login
@@ -65,7 +65,7 @@ jobs:
         with:
           token_format: 'access_token'
           service_account: artifact-writer@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_POOL_PROJECT_NUMBER }}
+          workload_identity_provider: ${{ vars.GCPV2_GITHUB_WORKLOAD_IDENTITY_PROVIDER }}
 
       - uses: docker/login-action@v3
         name: Docker login
