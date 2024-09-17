@@ -11,7 +11,32 @@ on:
       - main
 
 jobs:
+  define-sessions:
+    runs-on: ubuntu-latest
+    outputs:
+      sessions: ${{ steps.set-sessions.outputs.sessions }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install nox
+
+      - name: List Nox sessions
+        id: list-sessions
+        run: nox --list --tag "test" --json > nox_sessions.json
+
+      - name: List and set Nox sessions matrix
+        id: set-sessions
+        run: |
+          sessions=$(nox --list --tag "test" --json | jq -r '. | map("\"" + .session + "\"") | join(",")')
+          echo "sessions=[$sessions]" >> $GITHUB_OUTPUT
+
   test:
+    needs: define-sessions
+    strategy:
+      matrix:
+        session: ${{ fromJSON(needs.define-sessions.outputs.sessions) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,4 +44,4 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install nox
-      - run: python3 -m nox
+      - run: python3 -m nox --session "${{ matrix.session }}"
