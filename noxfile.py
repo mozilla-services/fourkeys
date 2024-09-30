@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import pathlib
 
 import nox
 
@@ -95,6 +96,22 @@ def formatting(session):
     session.install("ruff")
     session.run("ruff", "format", ".")
     session.run("ruff", "check", ".", "--fix")
+
+
+@nox.session(python=False)
+@nox.parametrize("folder", FOLDERS)
+def dev(session: nox.Session, folder) -> None:
+    """Create Python virtual environments in subdirectories containing tests"""
+
+    session.chdir(folder)
+
+    VENV_DIR = pathlib.Path("./.venv").resolve()
+    session.run("python", "-m", "venv", os.fsdecode(VENV_DIR), silent=True)
+
+    python = os.fsdecode(VENV_DIR.joinpath("bin/python"))
+    session.run(
+        python, "-m", "pip", "install", "-r", "requirements-test.txt", external=True
+    )
 
 
 nox.options.sessions = ["lint", "test"]

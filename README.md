@@ -199,6 +199,19 @@ To fix any (fixable) errors reported by the linting check, there is also a `form
 python3 -m nox -s "formatting"
 ```
 
+## Setting up virtual environments
+
+To make code changes to a specific service and its tests, it's a good idea to:
+
+- set up a virtual environment
+- install that service's `requirements-test.txt` requirements
+- activate that environment
+
+For the sake of convenience, we have a nox session to set up virtual environments in each service:
+
+```sh
+python3 -m nox -s "dev"
+```
 
 # Data schema
 
