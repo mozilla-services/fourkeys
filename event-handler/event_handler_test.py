@@ -14,11 +14,11 @@
 
 import hmac
 from hashlib import sha1
+from unittest import mock
+
+import pytest
 
 import event_handler
-
-from unittest import mock
-import pytest
 
 
 @pytest.fixture
@@ -43,20 +43,18 @@ def test_missing_signature(client):
 @mock.patch("sources.get_secret", mock.MagicMock(return_value=b"foo"))
 def test_unverified_signature(client):
     r = client.post(
-            "/",
-            headers={
-                "User-Agent": "GitHub-Hookshot",
-                "X-Hub-Signature": "foobar",
-            },
-        )
+        "/",
+        headers={
+            "User-Agent": "GitHub-Hookshot",
+            "X-Hub-Signature": "foobar",
+        },
+    )
 
     assert r.status_code == 403
 
 
 @mock.patch("sources.get_secret", mock.MagicMock(return_value=b"foo"))
-@mock.patch(
-    "event_handler.publish_to_pubsub", mock.MagicMock(return_value=True)
-)
+@mock.patch("event_handler.publish_to_pubsub", mock.MagicMock(return_value=True))
 def test_verified_signature(client):
     signature = "sha1=" + hmac.new(b"foo", b"Hello", sha1).hexdigest()
     r = client.post(
@@ -80,7 +78,5 @@ def test_data_sent_to_pubsub(client):
 
     r = client.post("/", data="Hello", headers=headers)
 
-    event_handler.publish_to_pubsub.assert_called_with(
-        "github", b"Hello", headers
-    )
+    event_handler.publish_to_pubsub.assert_called_with("github", b"Hello", headers)
     assert r.status_code == 204

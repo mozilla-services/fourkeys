@@ -14,12 +14,12 @@
 
 import base64
 import json
+from unittest import mock
 
-import main
+import pytest
 import shared
 
-from unittest import mock
-import pytest
+import main
 
 
 @pytest.fixture
@@ -59,10 +59,13 @@ def test_missing_msg_attributes(client):
 
 def test_gitlab_event_processed(client):
     headers = {"X-Gitlab-Event": "push", "X-Gitlab-Token": "foo"}
-    data = json.dumps({"object_kind": "push",
-                       "checkout_sha": "foo",
-                       "commits": [{"id": "foo", "timestamp": 2}],
-                       }).encode("utf-8")
+    data = json.dumps(
+        {
+            "object_kind": "push",
+            "checkout_sha": "foo",
+            "commits": [{"id": "foo", "timestamp": 2}],
+        }
+    ).encode("utf-8")
 
     pubsub_msg = {
         "message": {
@@ -97,11 +100,14 @@ def test_gitlab_event_processed(client):
 
 def test_timestamp_timezone_event_processed(client):
     headers = {"X-Gitlab-Event": "deployment", "X-Gitlab-Token": "foo"}
-    data = json.dumps({"object_kind": "deployment",
-                       "short_sha": "279484c0",
-                       "status_changed_at": "2021-04-28 21:50:00 +0200",
-                       "deployment_id": 15,
-                       }).encode("utf-8")
+    data = json.dumps(
+        {
+            "object_kind": "deployment",
+            "short_sha": "279484c0",
+            "status_changed_at": "2021-04-28 21:50:00 +0200",
+            "deployment_id": 15,
+        }
+    ).encode("utf-8")
 
     pubsub_msg = {
         "message": {

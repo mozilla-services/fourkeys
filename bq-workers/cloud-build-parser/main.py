@@ -13,11 +13,10 @@
 # limitations under the License.
 
 import base64
-import os
 import json
+import os
 
 import shared
-
 from flask import Flask, request
 
 app = Flask(__name__)
@@ -53,11 +52,11 @@ def index():
 
     except Exception as e:
         entry = {
-                "severity": "WARNING",
-                "msg": "Data not saved to BigQuery",
-                "errors": str(e),
-                "json_payload": envelope
-            }
+            "severity": "WARNING",
+            "msg": "Data not saved to BigQuery",
+            "errors": str(e),
+            "json_payload": envelope,
+        }
         print(json.dumps(entry))
 
     return "", 204
@@ -74,7 +73,11 @@ def process_cloud_build_event(attr, msg):
     metadata = json.loads(base64.b64decode(msg["data"]).decode("utf-8").strip())
 
     # Most up to date timestamp for the event
-    time_created = (metadata.get("finishTime") or metadata.get("startTime") or metadata.get("createTime"))
+    time_created = (
+        metadata.get("finishTime")
+        or metadata.get("startTime")
+        or metadata.get("createTime")
+    )
 
     build_event = {
         "event_type": event_type,

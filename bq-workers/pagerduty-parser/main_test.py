@@ -14,12 +14,12 @@
 
 import base64
 import json
+from unittest import mock
 
-import main
+import pytest
 import shared
 
-from unittest import mock
-import pytest
+import main
 
 
 @pytest.fixture
@@ -58,7 +58,16 @@ def test_missing_msg_attributes(client):
 
 
 def test_pagerduty_event_processed(client):
-    data = json.dumps({"foo": "bar", "event": {"id": "foo", "occurred_at": 0, "event_type": "incident.triggered"}}).encode("utf-8")
+    data = json.dumps(
+        {
+            "foo": "bar",
+            "event": {
+                "id": "foo",
+                "occurred_at": 0,
+                "event_type": "incident.triggered",
+            },
+        }
+    ).encode("utf-8")
     pubsub_msg = {
         "message": {
             "data": base64.b64encode(data).decode("utf-8"),

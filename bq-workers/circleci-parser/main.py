@@ -13,11 +13,10 @@
 # limitations under the License.
 
 import base64
-import os
 import json
+import os
 
 import shared
-
 from flask import Flask, request
 
 app = Flask(__name__)
@@ -58,11 +57,11 @@ def index():
 
     except Exception as e:
         entry = {
-                "severity": "WARNING",
-                "msg": "Data not saved to BigQuery",
-                "errors": str(e),
-                "json_payload": envelope
-            }
+            "severity": "WARNING",
+            "msg": "Data not saved to BigQuery",
+            "errors": str(e),
+            "json_payload": envelope,
+        }
         print(json.dumps(entry))
 
     return "", 204

@@ -20,6 +20,7 @@ import nox
 # Utility Functions
 #
 
+
 def _collect_dirs(
     start_dir,
     suffix="_test.py",
@@ -41,9 +42,7 @@ def _collect_dirs(
             yield parent
         else:
             # Filter out dirs we don't want to recurse into
-            subdirs[:] = [
-                s for s in subdirs if s[0].isalpha()
-            ]
+            subdirs[:] = [s for s in subdirs if s[0].isalpha()]
 
 
 #
@@ -67,7 +66,7 @@ def _session_tests(session, folder):
         # Pytest will return 5 when no tests are collected. This can happen
         # on travis where slow and flaky tests are excluded.
         # See http://doc.pytest.org/en/latest/_modules/_pytest/main.html
-        success_codes=[0, 5]
+        success_codes=[0, 5],
     )
 
 
