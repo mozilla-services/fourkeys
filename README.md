@@ -185,6 +185,21 @@ python3 -m nox -s "{name_of_session}"
 
 The "name_of_session" will be something like "py-3.6(folder='.....').  
 
+## Running linting and formatting
+
+As mentioned above, this project also uses nox to run linting checks. To run just linting checks:
+
+```sh
+python3 -m nox -s "lint"
+```
+
+To fix any (fixable) errors reported by the linting check, there is also a `formatting` session. To automatically apply formatting, run:
+
+```sh
+python3 -m nox -s "formatting"
+```
+
+
 # Data schema
 
 ### `four_keys.events_raw`
