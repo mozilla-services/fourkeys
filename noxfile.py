@@ -13,12 +13,14 @@
 # limitations under the License.
 
 import os
-import nox
+import pathlib
 
+import nox
 
 #
 # Utility Functions
 #
+
 
 def _collect_dirs(
     start_dir,
@@ -41,9 +43,7 @@ def _collect_dirs(
             yield parent
         else:
             # Filter out dirs we don't want to recurse into
-            subdirs[:] = [
-                s for s in subdirs if s[0].isalpha()
-            ]
+            subdirs[:] = [s for s in subdirs if s[0].isalpha()]
 
 
 #
@@ -67,13 +67,13 @@ def _session_tests(session, folder):
         # Pytest will return 5 when no tests are collected. This can happen
         # on travis where slow and flaky tests are excluded.
         # See http://doc.pytest.org/en/latest/_modules/_pytest/main.html
-        success_codes=[0, 5]
+        success_codes=[0, 5],
     )
 
 
 @nox.session(python=["3.12"])
 @nox.parametrize("folder", FOLDERS)
-def py(session, folder):
+def test(session, folder):
     """Runs py.test for a folder using the specified version of Python."""
     session.install("-r", "requirements-test.txt")
     _session_tests(session, folder)
@@ -84,44 +84,34 @@ def py(session, folder):
 #
 
 
-# Ignore I202 "Additional newline in a section of imports." to accommodate
-# region tags in import blocks. Since we specify an explicit ignore, we also
-# have to explicitly ignore the list of default ignores:
-# `E121,E123,E126,E226,E24,E704,W503,W504` as shown by `flake8 --help`.
-def _determine_local_import_names(start_dir):
-    """Determines all import names that should be considered "local".
-    This is used when running the linter to insure that import order is
-    properly checked.
-    """
-    file_ext_pairs = [os.path.splitext(path) for path in os.listdir(start_dir)]
-    return [
-        basename
-        for basename, extension in file_ext_pairs
-        if extension == ".py"
-        or os.path.isdir(os.path.join(start_dir, basename))
-        and basename not in ("__pycache__")
-    ]
-
-
-FLAKE8_COMMON_ARGS = [
-    "--show-source",
-    "--builtin=gettext",
-    "--max-complexity=20",
-    "--import-order-style=google",
-    "--exclude=.nox,.cache,env,lib,generated_pb2,*_pb2.py,*_pb2_grpc.py",
-    "--ignore=E121,E123,E126,E203,E226,E24,E266,E501,E704,W503,W504,I100,I201,I202",
-    "--max-line-length=88",
-]
+@nox.session
+def lint(session):
+    session.install("ruff")
+    session.run("ruff", "format", "--check", ".")
+    session.run("ruff", "check", ".")
 
 
 @nox.session
-def lint(session):
-    session.install("flake8", "flake8-import-order")
+def formatting(session):
+    session.install("ruff")
+    session.run("ruff", "format", ".")
+    session.run("ruff", "check", ".", "--fix")
 
-    local_names = _determine_local_import_names(".")
-    args = FLAKE8_COMMON_ARGS + [
-        "--application-import-names",
-        ",".join(local_names),
-        ".",
-    ]
-    session.run("flake8", *args)
+
+@nox.session(python=False)
+@nox.parametrize("folder", FOLDERS)
+def dev(session: nox.Session, folder) -> None:
+    """Create Python virtual environments in subdirectories containing tests"""
+
+    session.chdir(folder)
+
+    VENV_DIR = pathlib.Path("./.venv").resolve()
+    session.run("python", "-m", "venv", os.fsdecode(VENV_DIR), silent=True)
+
+    python = os.fsdecode(VENV_DIR.joinpath("bin/python"))
+    session.run(
+        python, "-m", "pip", "install", "-r", "requirements-test.txt", external=True
+    )
+
+
+nox.options.sessions = ["lint", "test"]
