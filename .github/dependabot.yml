@@ -6,10 +6,7 @@ updates:
       interval: "weekly"
   - package-ecosystem: "pip"
     directories:
-      - "/"
-      - "/data-generator"
-      - "/event-handler"
-      - "/bq-workers/*"
+      - "**/*"
     schedule:
       interval: "weekly"
     reviewers:
@@ -18,7 +15,4 @@ updates:
     schedule:
       interval: "weekly"
     directories:
-    - "/bq-workers/*"
-    - "/dashboard"
-    - "/event-handler"
-    - "/setup/fourkeys-builder"
+    - "**/*"

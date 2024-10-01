@@ -14,12 +14,12 @@
 
 import base64
 import json
+from unittest import mock
 
-import main
+import pytest
 import shared
 
-from unittest import mock
-import pytest
+import main
 
 
 @pytest.fixture
@@ -59,9 +59,7 @@ def test_missing_msg_attributes(client):
 
 def test_github_event_processed(client):
     headers = {"X-Github-Event": "push", "X-Hub-Signature": "foo"}
-    commit = json.dumps({"head_commit": {"timestamp": 0, "id": "bar"}}).encode(
-        "utf-8"
-    )
+    commit = json.dumps({"head_commit": {"timestamp": 0, "id": "bar"}}).encode("utf-8")
     pubsub_msg = {
         "message": {
             "data": base64.b64encode(commit).decode("utf-8"),
@@ -93,17 +91,14 @@ def test_github_event_processed(client):
 
 
 def test_github_event_avoid_id_conflicts_pull_requests(client):
-
     headers = {"X-Github-Event": "pull_request", "X-Hub-Signature": "foo"}
-    commit = json.dumps({
-        "pull_request": {
-            "updated_at": "2021-06-15T13:12:14Z"
-        },
-        "repository": {
-            "name": "reponame"
-        },
-        "number": 477
-    }).encode("utf-8")
+    commit = json.dumps(
+        {
+            "pull_request": {"updated_at": "2021-06-15T13:12:14Z"},
+            "repository": {"name": "reponame"},
+            "number": 477,
+        }
+    ).encode("utf-8")
 
     encoded_commit = {
         "data": base64.b64encode(commit).decode("utf-8"),
@@ -111,26 +106,22 @@ def test_github_event_avoid_id_conflicts_pull_requests(client):
         "message_id": "foobar",
     }
 
-    github_event_calculated = main.process_github_event(headers=headers, msg=encoded_commit)
-    github_event_expected = {
-        "id": "reponame/477"
-    }
+    github_event_calculated = main.process_github_event(
+        headers=headers, msg=encoded_commit
+    )
+    github_event_expected = {"id": "reponame/477"}
 
     assert github_event_calculated["id"] == github_event_expected["id"]
 
 
 def test_github_event_avoid_id_conflicts_issues(client):
-
     headers = {"X-Github-Event": "issues", "X-Hub-Signature": "foo"}
-    commit = json.dumps({
-        "issue": {
-            "updated_at": "2021-06-15T13:12:14Z",
-            "number": 477
-        },
-        "repository": {
-            "name": "reponame"
+    commit = json.dumps(
+        {
+            "issue": {"updated_at": "2021-06-15T13:12:14Z", "number": 477},
+            "repository": {"name": "reponame"},
         }
-    }).encode("utf-8")
+    ).encode("utf-8")
 
     encoded_commit = {
         "data": base64.b64encode(commit).decode("utf-8"),
@@ -138,9 +129,9 @@ def test_github_event_avoid_id_conflicts_issues(client):
         "message_id": "foobar",
     }
 
-    github_event_calculated = main.process_github_event(headers=headers, msg=encoded_commit)
-    github_event_expected = {
-        "id": "reponame/477"
-    }
+    github_event_calculated = main.process_github_event(
+        headers=headers, msg=encoded_commit
+    )
+    github_event_expected = {"id": "reponame/477"}
 
     assert github_event_calculated["id"] == github_event_expected["id"]

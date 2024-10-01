@@ -185,6 +185,34 @@ python3 -m nox -s "{name_of_session}"
 
 The "name_of_session" will be something like "py-3.6(folder='.....').  
 
+## Running linting and formatting
+
+As mentioned above, this project also uses nox to run linting checks. To run just linting checks:
+
+```sh
+python3 -m nox -s "lint"
+```
+
+To fix any (fixable) errors reported by the linting check, there is also a `formatting` session. To automatically apply formatting, run:
+
+```sh
+python3 -m nox -s "formatting"
+```
+
+## Setting up virtual environments
+
+To make code changes to a specific service and its tests, it's a good idea to:
+
+- set up a virtual environment
+- install that service's `requirements-test.txt` requirements
+- activate that environment
+
+For the sake of convenience, we have a nox session to set up virtual environments in each service:
+
+```sh
+python3 -m nox -s "dev"
+```
+
 # Data schema
 
 ### `four_keys.events_raw`

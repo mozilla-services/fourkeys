@@ -14,14 +14,13 @@
 
 import base64
 import json
+from unittest import mock
 
-import main
+import pytest
 import shared
-
 from cloudevents.http import CloudEvent, to_structured
 
-from unittest import mock
-import pytest
+import main
 
 
 @pytest.fixture
@@ -64,7 +63,7 @@ def test_tekton_source_event_processed(client):
         "type": "tekton.foo",
         "source": "https://example.com/event-producer",
         "time": 0,
-        "id": "bar"
+        "id": "bar",
     }
     data = {"pipelineRun": {"metadata": {"uid": "foo"}}}
     event = CloudEvent(attributes, data)

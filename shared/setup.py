@@ -15,13 +15,13 @@
 from setuptools import setup
 
 setup(
-   name='shared',
-   version='1.0',
-   description='Shared functions for the Four Keys pipeline',
-   url='git@github.com:four-keys-playground.git#egg=shared&subdirectory=shared',
-   author='Google Inc.',
-   license='Apache-2.0',
-   py_modules=['shared'],
-   install_requires=['google-cloud-bigquery'],
-   zip_safe=False
+    name="shared",
+    version="1.0",
+    description="Shared functions for the Four Keys pipeline",
+    url="git@github.com:four-keys-playground.git#egg=shared&subdirectory=shared",
+    author="Google Inc.",
+    license="Apache-2.0",
+    py_modules=["shared"],
+    install_requires=["google-cloud-bigquery"],
+    zip_safe=False,
 )

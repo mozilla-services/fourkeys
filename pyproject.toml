@@ -1,0 +1,17 @@
+[tool.ruff]
+# https://docs.astral.sh/ruff/settings/#src
+src = [".", "data-generator", "event-handler", "bq-workers/*", "shared"]
+
+[tool.ruff.lint]
+# Enables pyflakes, subset of pycodestyle, and isort rules
+# Adapted from Ruff's default configuration https://docs.astral.sh/ruff/configuration/#__tabbed_1_1
+# https://docs.astral.sh/ruff/rules/#pyflakes-f
+# https://docs.astral.sh/ruff/rules/#error-e
+# https://docs.astral.sh/ruff/rules/#isort-i
+extend-select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.isort]
+# Though this is a package we specify in `src`, since we pip-install it from
+# the git repository like git+https://github.com/mozilla-services/fourkeys.git#egg=shared&subdirectory=shared
+# it should be treated as a third party
+known-third-party = ["shared"]

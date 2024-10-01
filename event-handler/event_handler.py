@@ -16,7 +16,7 @@ import json
 import os
 import sys
 
-from flask import abort, Flask, request
+from flask import Flask, abort, request
 from google.cloud import pubsub_v1
 
 import sources
@@ -76,9 +76,7 @@ def publish_to_pubsub(source, msg, headers):
         print(topic_path)
 
         # Pub/Sub data must be bytestring, attributes must be strings
-        future = publisher.publish(
-            topic_path, data=msg, headers=json.dumps(headers)
-        )
+        future = publisher.publish(topic_path, data=msg, headers=json.dumps(headers))
 
         exception = future.exception()
         if exception:

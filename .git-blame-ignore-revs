@@ -1,0 +1,5 @@
+# Run: git config blame.ignoreRevsFile .git-blame-ignore-revs
+# to remove the following commits from git-blame
+
+# Run `ruff` formatting after adding to noxfile
+42c3c5d0ff321b8eae521e5fe5aba38f39815271
