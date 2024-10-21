@@ -1,4 +1,0 @@
-project_id = "<PROJECT_ID>"
-region = "<REGION>"
-bigquery_region = "<BIGQUERY_REGION>"
-parsers = ["<PARSER>", "<PARSER>"]
