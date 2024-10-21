@@ -50,35 +50,13 @@ This diagram shows the design of the Four Keys system:
   * Contains a Python script for generating mock GitHub or Gitlab data.
 * `event-handler/`
   * Contains the code for the `event-handler`, which is the public service that accepts incoming webhooks.  
-* `queries/`
-  * Contains the SQL queries for creating the derived tables.
-* `setup/`
-  * Contains the code for setting up and tearing down the Four Keys pipeline. Also contains a script for extending the data sources.
 * `shared/`
   * Contains a shared module for inserting data into BigQuery, which is used by the `bq-workers`
-* `terraform/`
-  * Contains Terraform modules and submodules, and examples for deploying Four Keys using Terraform.
 
 # How to use 
 
-## Out of the box
-
-_The project uses Python 3 and supports data extraction for Cloud Build and GitHub events._
-
-1.  Fork this project.
-1.  Run the automation scripts, which does the following (See the [setup README](setup/README.md) for more details):
-    1.  Create and deploy the Cloud Run webhook target and ETL workers.
-    1.  Create the Pub/Sub topics and subscriptions.
-    1.  Enable the Google Secret Manager and create a secret for your GitHub repo.
-    1.  Create a BigQuery dataset, tables and views.
-    1.  Output a URL for the newly generated Grafana dashboard. 
-1.  Set up your development environment to send events to the webhook created in the second step.
-    1.  Add the secret to your GitHub webhook.
-
 _NOTE: Make sure you don't use "Squash Merging" in Git when merging back into trunk. This breaks the link between the commit into trunk and the commits from the branch you developed on and as thus it is not possible to measure "Time to Change" on these commits. It is possible to disable this feature in the settings of your repo_
 ## Generating mock data
-
-The setup script includes an option to generate mock data. Generate mock data to play with and test the Four Keys project.
 
 The data generator creates mocked GitHub events, which are ingested into the table with the source “githubmock.” It creates following events: 
 
@@ -88,7 +66,7 @@ The data generator creates mocked GitHub events, which are ingested into the tab
 * Associated mock incidents 
   * _Note: By default, less than 15% of deployments create a mock incident. This threshold can be adjusted in the script._
 
-To run outside of the setup script:
+To run this data generator:
 
 1. Ensure that you’ve saved your webhook URL and secret in your environment variables:
 
@@ -112,24 +90,6 @@ To run outside of the setup script:
 
     ```sql
     SELECT * FROM four_keys.events_raw WHERE source = 'githubmock';
-    ```
-
-## Reclassifying events / updating your queries
-
-The scripts consider some events to be “changes”, “deploys”, and “incidents.” You may want to reclassify one or more of these events, for example, if you want to use a label for your incidents other than “incident.” To reclassify one of the events in the table, no changes are required on the architecture or code of the project.
-
-1.  Update the view in BigQuery for the following tables:
-
-    *   `four_keys.changes`
-    *   `four_keys.deployments`
-    *   `four_keys.incidents`
-
-    To update the view, we recommend that you update the `sql` files in the `queries` folder, rather than in the BigQuery UI.
-
-1.  Once you've edited the SQL, run `terraform apply` to update the view that populates the table:
-
-    ```sh 
-    cd ./setup && terraform apply
     ```
 
 Notes: 

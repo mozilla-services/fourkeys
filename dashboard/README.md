@@ -29,8 +29,3 @@ The dashboard is running in a transient container. It does not store data.  Ther
 
 To rebuild and deploy the container, you can run `gcloud builds submit` in this directory. 
 
-
-## To deploy dashboard
-If using [Terraform](https://www.terraform.io), please see the [setup](../setup/) to create the resources.  
-
-Once the resource is created or if you are not using Terraform, feel free to build and deploy outside of Terraform by running `gcloud builds submit` in this directory. 
