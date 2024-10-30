@@ -3,4 +3,4 @@ gunicorn==23.0.0
 google-cloud-bigquery==3.26.0
 cloudevents==1.11.0
 git+https://github.com/mozilla-services/fourkeys.git#egg=shared&subdirectory=shared
-protobuf==5.28.2
+protobuf==5.28.3
