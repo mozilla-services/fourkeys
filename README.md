@@ -21,7 +21,7 @@ Use Four Keys if:
 *   You have a project in GitHub.
 *   Your project has deployments.
 
-Four Keys works well with projects that have deployments. Projects with releases and no deployments, for example, libraries, do not work well because of how GitHub present their data about releases.
+Four Keys works well with projects that have deployments. Projects with releases and no deployments, for example, libraries, do not work well because of how GitHub presents its data about releases.
 
 For a quick baseline of your team's software delivery performance, you can also use the [DORA DevOps Quick Check](https://www.devops-research.com/quickcheck.html). The quick check also suggests DevOps capabilities you can work on to improve your performance. The Four Keys project itself can help you improve the following DevOps capabilities:
 
