@@ -4,7 +4,7 @@
 
 # Background
 
-Through six years of research, the [DevOps Research and Assessment (DORA)](https://cloud.google.com/blog/products/devops-sre/the-2019-accelerate-state-of-devops-elite-performance-productivity-and-scaling) team has identified four key metrics that indicate the performance of software delivery. Four Keys allows you to collect data from your development environment (such as GitHub or GitLab) and compiles it into a dashboard displaying these key metrics.
+Through six years of research, the [DevOps Research and Assessment (DORA)](https://cloud.google.com/blog/products/devops-sre/the-2019-accelerate-state-of-devops-elite-performance-productivity-and-scaling) team has identified four key metrics that indicate the performance of software delivery. Four Keys allows you to collect data from your development environment (such as GitHub) and compiles it into a dashboard displaying these key metrics.
 
 These four key metrics are:
 
@@ -18,10 +18,10 @@ These four key metrics are:
 Use Four Keys if:
 
 *   You want to measure your team's software delivery performance. For example, you may want to track the impact of new tooling or more automated test coverage, or you may want a baseline of your team's performance. 
-*   You have a project in GitHub or GitLab.
+*   You have a project in GitHub.
 *   Your project has deployments.
 
-Four Keys works well with projects that have deployments. Projects with releases and no deployments, for example, libraries, do not work well because of how GitHub and GitLab present their data about releases.
+Four Keys works well with projects that have deployments. Projects with releases and no deployments, for example, libraries, do not work well because of how GitHub presents its data about releases.
 
 For a quick baseline of your team's software delivery performance, you can also use the [DORA DevOps Quick Check](https://www.devops-research.com/quickcheck.html). The quick check also suggests DevOps capabilities you can work on to improve your performance. The Four Keys project itself can help you improve the following DevOps capabilities:
 
@@ -31,7 +31,7 @@ For a quick baseline of your team's software delivery performance, you can also 
 
 # How it works
 
-1.  Events are sent to a webhook target hosted on Cloud Run. Events are any occurrence in your development environment (for example, GitHub or GitLab) that can be measured, such as a pull request or new issue. Four Keys defines events to measure, and you can add others that are relevant to your project.
+1.  Events are sent to a webhook target hosted on Cloud Run. Events are any occurrence in your development environment (for example, GitHub) that can be measured, such as a pull request or new issue. Four Keys defines events to measure, and you can add others that are relevant to your project.
 1.  The Cloud Run target publishes all events to Pub/Sub.
 1.  A Cloud Run instance is subscribed to the Pub/Sub topics, does some light data transformation, and inputs the data into BigQuery.
 1.  The BigQuery view to complete the data transformations and feed into the dashboard.
@@ -47,7 +47,7 @@ This diagram shows the design of the Four Keys system:
 * `dashboard/`
   * Contains the code for the Grafana dashboard displaying the Four Keys metrics
 * `data-generator/`
-  * Contains a Python script for generating mock GitHub or Gitlab data.
+  * Contains a Python script for generating mock GitHub data.
 * `event-handler/`
   * Contains the code for the `event-handler`, which is the public service that accepts incoming webhooks.  
 * `shared/`

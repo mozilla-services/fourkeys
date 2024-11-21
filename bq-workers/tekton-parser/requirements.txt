@@ -1,6 +1,0 @@
-Flask==3.0.3
-gunicorn==23.0.0
-google-cloud-bigquery==3.27.0
-cloudevents==1.11.0
-git+https://github.com/mozilla-services/fourkeys.git#egg=shared&subdirectory=shared
-protobuf==5.28.3

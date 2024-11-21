@@ -128,12 +128,6 @@ def get_source(headers):
     """
     Gets the source from the User-Agent header
     """
-    if "X-Gitlab-Event" in headers:
-        return "gitlab"
-
-    if "tekton" in headers.get("Ce-Type", ""):
-        return "tekton"
-
     if "GitHub-Hookshot" in headers.get("User-Agent", ""):
         return "github"
 
@@ -148,8 +142,6 @@ def get_source(headers):
 
 AUTHORIZED_SOURCES = {
     "github": EventSource("X-Hub-Signature", github_verification),
-    "gitlab": EventSource("X-Gitlab-Token", simple_token_verification),
-    "tekton": EventSource("tekton-secret", simple_token_verification),
     "circleci": EventSource("Circleci-Signature", circleci_verification),
     "pagerduty": EventSource("X-Pagerduty-Signature", pagerduty_verification),
 }
