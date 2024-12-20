@@ -98,6 +98,21 @@ def process_github_event(headers, msg):
         time_created = metadata["head_commit"]["timestamp"]
         e_id = metadata["head_commit"]["id"]
 
+        # remove unused metadata fields to reduce data usage and complexity
+        metadata = {
+            "ref": metadata["ref"],
+            "before": metadata["before"],
+            "after": metadata["after"],
+            "repository": {
+                "full_name": metadata["repository"]["full_name"],
+                "url": metadata["repository"]["url"],
+                "private": metadata["repository"]["private"],
+            },
+            "pusher": metadata["pusher"],
+            "commits": metadata["commits"],
+            "head_commit": metadata["head_commit"],
+        }
+
     if event_type == "pull_request":
         time_created = metadata["pull_request"]["updated_at"]
         e_id = metadata["repository"]["name"] + "/" + str(metadata["number"])
@@ -134,6 +149,24 @@ def process_github_event(headers, msg):
     if event_type == "deployment_status":
         time_created = metadata["deployment_status"]["updated_at"]
         e_id = metadata["deployment_status"]["id"]
+
+        # remove unused metadata fields to reduce data usage and complexity
+        metadata = {
+            "deployment_status": {
+                "state": metadata["deployment_status"]["state"],
+                "environment": metadata["deployment_status"]["environment"], # not sure this is needed, can we just get environment from deployment?
+            },
+            "deployment": {
+                "environment": metadata["deployment"]["environment"],
+                "ref": metadata["deployment"]["ref"],
+                "sha": metadata["deployment"]["sha"],
+            },
+            "repository": {
+                "full_name": metadata["repository"]["full_name"],
+                "url": metadata["repository"]["url"],
+                "private": metadata["repository"]["private"],
+            },
+        }
 
     if event_type == "status":
         time_created = metadata["updated_at"]
