@@ -59,7 +59,23 @@ def test_missing_msg_attributes(client):
 
 def test_github_event_processed(client):
     headers = {"X-Github-Event": "push", "X-Hub-Signature": "foo"}
-    commit = json.dumps({"head_commit": {"timestamp": 0, "id": "bar"}}).encode("utf-8")
+    metadata = {
+        "ref": "refs/heads/external-config",
+        "before": "foo",
+        "after": "bar",
+        "repository": {
+            "full_name": "testorg/testrepo",
+            "url": "https://github.com/testorg/testrepo",
+        },
+        "pusher": {"name": "test", "email": "test@test.com"},
+        "commits": [{"timestamp": 0, "id": "bar"}],
+        "head_commit": {
+            "timestamp": 0,
+            "id": "bar",
+        },
+    }
+
+    commit = json.dumps(metadata).encode("utf-8")
     pubsub_msg = {
         "message": {
             "data": base64.b64encode(commit).decode("utf-8"),
@@ -71,7 +87,7 @@ def test_github_event_processed(client):
     github_event = {
         "event_type": "push",
         "id": "bar",
-        "metadata": '{"head_commit": {"timestamp": 0, "id": "bar"}}',
+        "metadata": '{"ref": "refs/heads/external-config", "before": "foo", "after": "bar", "repository": {"full_name": "testorg/testrepo", "url": "https://github.com/testorg/testrepo"}, "pusher": {"name": "test", "email": "test@test.com"}, "commits": [{"timestamp": 0, "id": "bar"}], "head_commit": {"timestamp": 0, "id": "bar"}}',
         "time_created": 0,
         "signature": "foo",
         "msg_id": "foobar",
